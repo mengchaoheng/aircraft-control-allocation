@@ -22,16 +22,17 @@ uMax(1:k) =[0.4363;0.4363;0.5236;0.5236;0.5236;0.5236;0.5236];
 
 INDX(1:k)=[true true true true true true true];
 
-% IN_MAT = [B     d;
-%           umin' 0;
-%           umax' 0;
-%           INDX  LPmethod];
+% IN_MAT = [B     d ye;
+%           umin' 0 0;
+%           umax' 0 0;
+%           INDX  LPmethod 0];
 
 
 
 LPmethod=7;% just 2 3 7 ok
 yd=[1;0;0]; 
-IN_MAT = [B yd;uMin' 0;uMax' 0;INDX  LPmethod];
+ye=[0;0;0.1];
+IN_MAT = [B yd ye;uMin' 0 0;uMax' 0 0;INDX  LPmethod 0];
 % [u] = LPwrap(IN_MAT);      
 % u(INDX)      
 % B(:,INDX>0.5)*u(INDX)        
@@ -52,7 +53,7 @@ u1=zeros(k,1);
 
 for i=1:(N+1)^2%%length(X)%length(M_des(1:1000,1))%
 v=15*[X(i);Y(i);Z(i)];% –Èƒ‚÷∏¡ÓM_des(i,:)'%
-IN_MAT(1:n,end)=v;
+IN_MAT(1:n,end-1)=v;
 
 %=====================================
 % u=pinv(B)*v;

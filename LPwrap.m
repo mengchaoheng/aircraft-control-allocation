@@ -1,10 +1,10 @@
 function [u] = LPwrap(IN_MAT)
 % Make single input, single output version of Linear Programming for use in
 % Simulink via the MATLAB Fcn block
-% IN_MAT = [B     d
-%           umin' 0
-%           umax' 0
-%           INDX  LPmethod]
+% IN_MAT = [B     d ye
+%           umin' 0 0
+%           umax' 0 0
+%           INDX  LPmethod 0]
 %
 % 20140905  Created version to use Roger Beck's DB_LPCA program
 % 20151206  Updated with Roger Beck's latest version of code and added 
@@ -14,7 +14,7 @@ global NumU
 % Get sizes
 [k2,m1]=size(IN_MAT);
 k=k2-3;
-m=m1-1;
+m=m1-2;
 % If matrices too small, set contols to zero and return
 if k<1 || m<1 || norm(IN_MAT)<1e-16
     u=zeros(NumU,1);
@@ -22,10 +22,11 @@ if k<1 || m<1 || norm(IN_MAT)<1e-16
 end
 % Partition input matrix into component matrices
 B=IN_MAT(1:k,1:m);
-v=IN_MAT(1:k,end);
+v=IN_MAT(1:k,end-1);
 umin=IN_MAT(k+1,1:m)';
 umax=IN_MAT(k+2,1:m)';
-LPmethod=IN_MAT(end,end);
+LPmethod=IN_MAT(end,end-1);
+ye=IN_MAT(1:k,end);
 % LPmethod should be an integer between 0 and 5
 % 0 = DB_LPCA
         %   Dual Branch Control Allocation - Linear Program
@@ -93,41 +94,41 @@ eMax=emax;
 w=wu;
 switch LPmethod
     case 0
-        [u_act, feas, errout,itlim] = DB_LPCA(yd,B,wd,up,wu,emax,...
+        [u_act, feas, errout,itlim] = DB_LPCA(yd+ye,B,wd,up,wu,emax,...
             uMin,uMax,itlim);
         %   Dual Branch Control Allocation - Linear Program
         %      Objective Error Minimization Branch (1-norm)
         %      Control Error Minimization (1-norm)
     case 1
-        [u_act, feas, errout,itlim] = DBinf_LPCA(yd,B,wd,up,wu,emax,...
+        [u_act, feas, errout,itlim] = DBinf_LPCA(yd+ye,B,wd,up,wu,emax,...
             uMin,uMax,itlim);
         %   Dual Branch Control Allocation - Linear Program
         %      Objective Error Minimization (1-norm)
         %      Control Error Minimization (inf-norm)
     case 2
-        [u_act, errout] = DP_LPCA(yd,B,uMin,uMax,itlim);
+        [u_act, errout] = DP_LPCA(yd+ye,B,uMin,uMax,itlim);
         % Direction Preserving Control Allocation Linear Program    
     case 3
-        [u_act,itlim,errout] = DPscaled_LPCA(yd,B,uMin,uMax,itlim);
+        [u_act,itlim,errout] = DPscaled_LPCA(yd+ye,B,uMin,uMax,itlim);
         % Direction Preserving Control Allocation Linear Program
         %     Reduced formulation (Solution Scaled from Boundary)
     case 4
-        [u_act,errout] = MO_LPCA(yd,B,up,lam, eMax,uMin,uMax,itlim);
+        [u_act,errout] = MO_LPCA(yd+ye,B,up,lam, eMax,uMin,uMax,itlim);
         % Mixed Optimization (Single Branch) Control Allocation Linear Program
         %    Objective Error Minimizing
         %    Control Error minimizing
     case 5
-        [u_act,errout] = SB_LPCA(yd,B,w,up,uMin,uMax,itlim);
+        [u_act,errout] = SB_LPCA(yd+ye,B,w,up,uMin,uMax,itlim);
         % Single Branch Control Allocation Linear Program
         %    Direction Preservingyd
         %    Control Error minimizing
     case 6
-        [u_act,errout] = SBprio_LPCA([yd(1);yd(2);yd(3)-0],[0;0;0],B,w,up,uMin,uMax,itlim);
+        [u_act,errout] = SBprio_LPCA(yd,ye,B,w,up,uMin,uMax,itlim);
         % Single Branch Control Allocation Linear Program
         %    Direction Preserving
         %    Control Error minimizing
     case 7
-        [u_act,errout] = DPprio_LPCA([yd(1);yd(2);(yd(3)-0)],[0;0;0],B,uMin,uMax,itlim);
+        [u_act,errout] = DPprio_LPCA(yd,ye,B,uMin,uMax,itlim);
         % Single Branch Control Allocation Linear Program
         %    Direction Preserving
         %    Control Error minimizing

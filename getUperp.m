@@ -9,6 +9,7 @@ function [ UK ] = getUperp( IN_MAT )
 % 20150823  KAB Created file to implement Durham's min-norm restoring
 % 20160301  KAB Added option to use weighting matrix
 
+% get u_perpendicular, in 7.4.4.1
 global NumU Wp
 [n1,m1]=size(IN_MAT);
 INDX=IN_MAT(end,:)>0.5;
@@ -21,8 +22,11 @@ if norm(Wp(INDX>0.5,INDX>0.5)-eye(sum(INDX>0.5)))<eps
     VV=zeros(n,1);
     VV(n,1)=-2;
     Uperp=pinv(Bx)*VV;
-
-    Kopt=2/(Uperp'*Uperp);
+    if all(abs(Uperp)<=eps)
+        Kopt=0;
+    else  
+        Kopt=2/(Uperp'*Uperp);
+    end
     UK(INDX,1)=Kopt*Uperp;
 else
     % Minimum Norm restoring with weighting matrix, min u'*Wp*u

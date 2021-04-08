@@ -1,3 +1,6 @@
+clear all;
+close all;
+
 %% LOAD TRIM DATA
 % ADMIRE tools used to create linear model trimmed in SSL M=0.3 at 2000 m
 % load('Trim_M0p3ALT2000_LinDATA')
@@ -59,7 +62,7 @@ Pmode = 3;
 % 4 - Cascading Generalized Inverse
 % 5 - Vertex Jumping Algorithm
 % 6 - Linear Programming
-CAmethod=0;
+CAmethod=6;
 % Specify which Linear Programming Algorithm
 % when CAmethod is 6
 % 0 - Dual Branch both 1-norm
@@ -68,7 +71,8 @@ CAmethod=0;
 % 3 - Dirction Preserving scaled
 % 4 - Mixed Optimization, single branch
 % 5 - Single Branch
-LPmethod=0;
+% 6 - prio based on Single Branch
+LPmethod=5;
 
 % Aero Surface Position Limits Function of Mach number
 % This data was taken from the file act_pos_lim.c provided with the ADMIRE
@@ -128,7 +132,7 @@ Urlim=[50*d2r   % R canard, rad/s
 % NOTE: No rate limit data available in Admire simulation for effectors 8
 % through 16, made up place holder values provided here. KAB
 
-UseRL=0; % Position limited commands, UseRL=0, add rate limits UseRL=1
+UseRL=1; % Position limited commands, UseRL=0, add rate limits UseRL=1
 % Aero Actuator Dynamics
 Uw=[20      % R canard
     20      % L canard
@@ -193,9 +197,9 @@ BGI=inv(BG);
 % Make pseudo inverse for ganged effectors
 PG=G*BGI;
 % Define control limits (low speed)
-Umax=[25 25 30 30 30 30 30]'*d2r;
-Umin=[-55 -55 -30 -30 -30 -30 -30]'*d2r;
-ulim=[Umin Umax];
+% Umax=[25 25 30 30 30 30 30]'*d2r;
+% Umin=[-55 -55 -30 -30 -30 -30 -30]'*d2r;
+% ulim=[Umin Umax];
 
 
 % Waypoint Data for navigation

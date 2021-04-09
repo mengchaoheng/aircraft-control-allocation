@@ -38,7 +38,7 @@ r2d=180/pi;
 % 4 - Cascading Generalized Inverse
 % 5 - Vertex Jumping Algorithm
 % 6 - Linear Programming
-CAmethod=6;
+CAmethod=1;
 % Specify which Linear Programming Algorithm
 % when CAmethod is 6
 % 0 - Dual Branch both 1-norm
@@ -156,8 +156,8 @@ uMax(1:effector)=ones(effector,1)*20*d2r;
 % [-0.5   0       0.5   0;
 %     0  -0.5    0       0.5;
 %     0.25   0.25   0.25   0.25];
-CB(1:3,1:effector)=[-0.50004   00001       0.5001   00002;
-    00000003  -0.5005    00000057       0.50003;
+CB(1:3,1:effector)=[-0.50004   0       0.5001   0;
+    0  -0.5005    0       0.50003;
     0.25005   0.2502   0.251   0.2503];
 % CB(1:3,1:effector) =[1.9808   -1.9805  -20.0502  -18.0003   17.9996   20.0471    7.7784;
 %     4.7436    4.7435   -5.0333   -8.3523   -8.3526   -5.0336         0;

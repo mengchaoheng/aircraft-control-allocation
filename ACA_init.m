@@ -43,13 +43,13 @@ CAmethod=6;
 % when CAmethod is 6
 % 0 - Dual Branch both 1-norm
 % 1 - Dual Branch, 1-norm and inf-norm
-% 2 - Direction Preserving
+% 2 - Direction Preserving==9
 % 3 - Dirction Preserving scaled
 % 4 - Mixed Optimization, single branch
-% 5 - Single Branch
+% 5 - Single Branch==8
 % 6 - priority based on Single Branch
 % 7 - priority based on Direction Preserving
-LPmethod=3;
+LPmethod=6;
 
 % Aero Surface Position Limits Function of Mach number
 % This data was taken from the file act_pos_lim.c provided with the ADMIRE
@@ -123,7 +123,7 @@ Urlim=[200*d2r   % R canard, rad/s
 % NOTE: No rate limit data available in Admire simulation for effectors 8
 % through 16, made up place holder values provided here. KAB
 
-UseRL=0; % Position limited commands, UseRL=0, add rate limits UseRL=1
+UseRL=1; % Position limited commands, UseRL=0, add rate limits UseRL=1
 
 
 
@@ -134,7 +134,7 @@ NumU=16; % Number of controls
 W=diag([1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]); %Diagonal weighting matrix
 Wp=W'*W; %Initialize Weight matrix to unity to start
 INDX=zeros(1,NumU);uMin=zeros(NumU,1);uMax=zeros(NumU,1);
-% CB=zeros(3,NumU);
+CB=zeros(3,NumU);
 INDX(1:effector)=ones(1,effector);
 
 % uMin(1:effector)=ones(effector,1)*(-20)*d2r;
@@ -153,16 +153,18 @@ uMin(effector+1:end)=[-10*d2r;LG_min; TSS_min; DTY_min; DTZ_min; UD_min; VD_min;
 % CB(1:3,1:effector)=[-0.50004   0       0.5001   0;
 %     0  -0.5005    0       0.50003;
 %     0.25005   0.2502   0.251   0.2503];
-% CB(1:3,1:effector) =[1.9808   -1.9805  -20.0502  -18.0003   17.9996   20.0471    7.7784;
-%     4.7436    4.7435   -5.0333   -8.3523   -8.3526   -5.0336         0;
-%    -1.3682    1.3681   -0.9695   -2.4887    2.4886    0.9693   -7.2922];
-% For Linear DI
-% Define C matrix to select control variables
-% Pb, Qb, Rb
-CCV=[0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1];
-CCV=[CCV zeros(3,22)];
-% CB only has control variables (3xm)
-CB=CCV*Bbare;
+CB(:,1:effector) =[0.7073   -0.7073   -3.4956   -3.0013    3.0013    3.4956    2.1103;
+    1.1204    1.1204   -0.7919   -1.2614   -1.2614   -0.7919    0.0035;
+   -0.3309    0.3309   -0.1507   -0.3088    0.3088    0.1507   -1.2680];
+% % For Linear DI
+% % Define C matrix to select control variables
+% % Pb, Qb, Rb
+% CCV=[0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1];
+% CCV=[CCV zeros(3,22)];
+% % CB only has control variables (3xm)
+% CB=CCV*Bbare;
+
+
 % % Use only first 7 (aerodynamic) controls
 CB2=CB(:,1:effector);
 P=pinv(CB2);

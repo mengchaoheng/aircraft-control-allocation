@@ -83,7 +83,7 @@ LPmethod=IN_MAT(end,end-1);
         %    Direction Preserving
         %    Control Error minimizing
 % If LPmethod is not one of the allowed options, set it to zero
-if sum(LPmethod==[0 1 2 3 4 5 6 7 8])~=1
+if sum(LPmethod==[0 1 2 3 4 5 6 7 8 9])~=1
     LPmethod=0;
 end
 
@@ -124,7 +124,7 @@ emax=ones(k,1)*2e1;
 itlim=50;
 lam=0.1;
 eMax=emax;
-w=1*wu;
+w=0.1*wu;
 switch LPmethod
     case 0
         [u_act, feas, errout,itlim] = DB_LPCA(yd+ye-Bu0,B,wd,up,wu,emax,...
@@ -166,7 +166,9 @@ switch LPmethod
         %    Direction Preserving
         %    Control Error minimizing
     case 8
-        [u_act,errout] = SBnew_LPCA(yd-Bu0,B,w,up,uMin,uMax);
+        [u_act,errout] = SBnew_LPCA(yd+ye-Bu0,B,w,up,uMin,uMax);
+    case 9
+        [u_act, errout] = DPnew_LPCA(yd+ye-Bu0,B,uMin,uMax,itlim);
 end
 u=zeros(NumU,1);
 u(INDX>0.5,1)=u_act;
@@ -2074,16 +2076,94 @@ A=[B           -B         -yd      zeros(n,m) zeros(n,m) zeros(n,1);
    zeros(1,m) zeros(1,m) 1          zeros(1,m) zeros(1,m) 1];
 b=[[0;0;0]-B*up;uMax-up;up-uMin;1];
 c=[w;w;-1;zeros(m,1); zeros(m,1); 0];
-% SB_LPCA(yd,B,w,up,uMin,uMax,500)
-% inq = zeros((2*m+n+1),1);
-%-------------------dont know--------------------------------------------
-% p = revised(A,b,c,inq,'min');
-% p.solve;
 %---------------------ok----------------------
-[x,~,exitflag,~,~] = linprog(c',[],[],A,b,zeros(size(A,2),1),ones(size(A,2),1)*Inf);
+[x,~,exitflag,~,~] = linprog(c',[],[],A,b,zeros(size(A,2),1),ones(size(A,2),1)*1000);
 %--------------------
-%  u=p.x(1:m)-p.x(m+1:2*m)
-%  lam=p.x(2*m+1)
  u=x(1:m)-x(m+1:2*m);
  errout=exitflag
+end
+
+function [u, errout] = DPnew_LPCA(yd,B,uMin,uMax,itlim)
+% Direction Preserving Control Allocation Linear Program
+%
+% function [u, errout] = DP_LPCA(yd,B,uMin,uMax,itlim);
+%
+%    Solves the control allocation problem while preserving the
+%  objective direction for unattainable commands. The solution
+%  is found by solving the problem,
+%    min -lambda,
+%    s.t. B*u = lambda*yd, uMin<=u<=uMax, 0<= lambda <=1
+%
+%  For yd outside the AMS, the solution returned is that the
+%  maximum in the direction of yd.
+%
+%  For yd strictly inside the AMS, the solution achieves
+%  Bu=yd and m-n controls will be at their limits; but there
+%  is no explicit preference to which solution will be 
+%  returned. This limits the usefulness of this routine as
+%  a practical allocator unless preferences for attainable solutions
+%  are handled externally.
+%
+%  (For derivation of a similar formulation see A.1.2 and A.2.3 in the
+%  text)
+%
+%
+%  Inputs:
+%          yd [n]    = Desired objective
+%          B [n,m]   = Control Effectiveness matrix
+%          uMin[m,1] = Lower bound for controls
+%          uMax[m,1] = Upper bound for controls
+%          itlim     = Number of allowed iterations limit
+%                         (Sum of iterations in both branches)
+%
+% Outputs:
+%         u[m,1]     = Control Solution
+%         errout     = Error Status code
+%                         0 = found solution
+%                         <0 = Error in finding initial basic feasible solution
+%                         >0 = Error in finding final solution
+%                         -1,1 = Solver error (unbounded solution)
+%                         -2   = Initial feasible solution not found
+%                         -3,3 = Iteration limit exceeded
+%         itlim      = Number of iterations remaining after solution found
+%
+% Calls:
+%         simplxuprevsol = Bounded Revised Simplex solver (simplxuprevsol.m)
+%
+% Notes:
+%   If errout ~0 there was a problem in the solution. %
+%
+%    Error code < 0 implies an error in the initialization and there is no guarantee on
+%  the quality of the output solution other than the control limits.
+%    Error code > 0 for errors in final solution--B*u is in the correct direction and has
+%  magnitude < yd, but B*u may not equal yd (for yd attainable)
+%   or be maximized (for yd unattainable)
+%
+% Modification History
+%   2002      Roger Beck  Original (DPcaLP8.m)
+%   8/2014    Roger Beck  Update for use in text
+
+
+%Initialize error code to zero
+errout = 0;
+tol = 1e-10;
+%Figure out how big the problem is (use standard CA definitions for m & n)
+[n,m] = size(B);
+%Check to see if yd == 0
+%  May want to adjust the tolerance to improve numerics of later steps
+if (all(abs(yd) < tol))    %yd = 0 ==> u=0
+    errout = -1;
+    u = zeros(m,1);
+    return;
+end
+%Construct an LP using scaling parameter to enforce direction preserving
+A = [B -yd];
+b = -B*uMin;
+c = [zeros(m,1);-1];
+h = [uMax-uMin; 1];
+%---------------------ok----------------------
+[x,~,exitflag,~,~] = linprog(c',[],[],A,b,zeros(size(A,2),1),h);
+%--------------------
+u = x(1:m)+uMin;
+ errout=exitflag    
 end

@@ -1,16 +1,24 @@
 function [u] = LPwrap(IN_MAT)
 % Make single input, single output version of Linear Programming for use in
 % Simulink via the MATLAB Fcn block
-% IN_MAT = [B     d ye
-%           umin' 0 0
-%           umax' 0 0
-%           INDX  LPmethod 0]
+% IN_MAT = [B     d         ye
+%           umin' 0         Bu0(1)
+%           umax' 0         Bu0(2)
+%           INDX  LPmethod  Bu0(3)]
 %
 % 20140905  Created version to use Roger Beck's DB_LPCA program
 % 20151206  Updated with Roger Beck's latest version of code and added 
 %           LPmethod to select the various Linear Programming algorithms 
 
 global NumU
+% persistent yd0;
+% if isempty(yd0)
+% yd0=[0;0;0];
+% end
+% persistent ye0;
+% if isempty(ye0)
+% ye0=[0;0;0];
+% end
 % Get sizes
 [k2,m1]=size(IN_MAT);
 k=k2-3;
@@ -23,10 +31,35 @@ end
 % Partition input matrix into component matrices
 B=IN_MAT(1:k,1:m);
 v=IN_MAT(1:k,end-1);
+ye=IN_MAT(1:k,end);
+Bu0=IN_MAT(k+1:end,end);
 umin=IN_MAT(k+1,1:m)';
 umax=IN_MAT(k+2,1:m)';
 LPmethod=IN_MAT(end,end-1);
-ye=IN_MAT(1:k,end);
+% if norm(Bu0)<1e-10 || (norm(yd0)<1e-10 && norm(ye0)<1e-10)
+%     yd0_real=[0;0;0];
+%     ye0_real=[0;0;0];
+% else
+%     if norm(yd0)>=1e-10 && norm(ye0)< 1e-10
+%         ye0_real=[0;0;0];
+%         yd0_real=Bu0;
+%     elseif norm(yd0)<1e-10 && norm(ye0)>= 1e-10
+%         yd0_real=[0;0;0];
+%         ye0_real=Bu0;
+%     else
+%         alpha=acos(dot(Bu0,yd0)/(norm(Bu0)*norm(yd0)));%余弦定理
+%         if alpha>pi
+%             alpha=pi-alpha;
+%         end
+%         beta=acos(dot(Bu0,ye0)/(norm(Bu0)*norm(ye0)));%余弦定理
+%         if beta>pi
+%             beta=pi-beta;
+%         end
+%         yd0_real=yd0/norm(yd0) * ( norm(Bu0)/sin(pi-alpha-beta) )*sin(beta);%正弦定理，结合单位化的向量
+%         ye0_real=ye0/norm(ye0) * ( norm(Bu0)/sin(pi-alpha-beta) )*sin(alpha);%正弦定理
+%     end
+% 
+% end
 % LPmethod should be an integer between 0 and 5
 % 0 = DB_LPCA
         %   Dual Branch Control Allocation - Linear Program
@@ -54,7 +87,7 @@ if sum(LPmethod==[0 1 2 3 4 5 6 7])~=1
     LPmethod=0;
 end
 
-INDX=IN_MAT(k+3,1:m)';
+INDX=IN_MAT(end,1:m)';
 m_act=sum(INDX);
 % get active effectors
 B_act=B(:,INDX>0.5); 
@@ -94,48 +127,49 @@ eMax=emax;
 w=wu;
 switch LPmethod
     case 0
-        [u_act, feas, errout,itlim] = DB_LPCA(yd+ye,B,wd,up,wu,emax,...
+        [u_act, feas, errout,itlim] = DB_LPCA(yd+ye-Bu0,B,wd,up,wu,emax,...
             uMin,uMax,itlim);
         %   Dual Branch Control Allocation - Linear Program
         %      Objective Error Minimization Branch (1-norm)
         %      Control Error Minimization (1-norm)
     case 1
-        [u_act, feas, errout,itlim] = DBinf_LPCA(yd+ye,B,wd,up,wu,emax,...
+        [u_act, feas, errout,itlim] = DBinf_LPCA(yd+ye-Bu0,B,wd,up,wu,emax,...
             uMin,uMax,itlim);
         %   Dual Branch Control Allocation - Linear Program
         %      Objective Error Minimization (1-norm)
         %      Control Error Minimization (inf-norm)
     case 2
-        [u_act, errout] = DP_LPCA(yd+ye,B,uMin,uMax,itlim);
+        [u_act, errout] = DP_LPCA(yd+ye-Bu0,B,uMin,uMax,itlim);
         % Direction Preserving Control Allocation Linear Program    
     case 3
-        [u_act,itlim,errout] = DPscaled_LPCA(yd+ye,B,uMin,uMax,itlim);
+        [u_act,itlim,errout] = DPscaled_LPCA(yd+ye-Bu0,B,uMin,uMax,itlim);
         % Direction Preserving Control Allocation Linear Program
         %     Reduced formulation (Solution Scaled from Boundary)
     case 4
-        [u_act,errout] = MO_LPCA(yd+ye,B,up,lam, eMax,uMin,uMax,itlim);
+        [u_act,errout] = MO_LPCA(yd+ye-Bu0,B,up,lam, eMax,uMin,uMax,itlim);
         % Mixed Optimization (Single Branch) Control Allocation Linear Program
         %    Objective Error Minimizing
         %    Control Error minimizing
     case 5
-        [u_act,errout] = SB_LPCA(yd+ye,B,w,up,uMin,uMax,itlim);
+        [u_act,errout] = SB_LPCA(yd+ye-Bu0,B,w,up,uMin,uMax,itlim);
         % Single Branch Control Allocation Linear Program
         %    Direction Preservingyd
         %    Control Error minimizing
     case 6
-        [u_act,errout] = SBprio_LPCA(yd,ye,B,w,up,uMin,uMax,itlim);
+        [u_act,errout] = SBprio_LPCA(yd-Bu0,ye,B,w,up,uMin,uMax,itlim);
         % Single Branch Control Allocation Linear Program
         %    Direction Preserving
         %    Control Error minimizing
     case 7
-        [u_act,errout] = DPprio_LPCA(yd,ye,B,uMin,uMax,itlim);
+        [u_act,errout] = DPprio_LPCA(yd-Bu0,ye,B,uMin,uMax,itlim);
         % Single Branch Control Allocation Linear Program
         %    Direction Preserving
         %    Control Error minimizing
 end
 u=zeros(NumU,1);
 u(INDX>0.5,1)=u_act;
-
+% ye0=ye;
+% yd0=yd;
 end
 
 function [u, feas, errout,itlim] = DB_LPCA(yd,B,wd,up,wu,emax,uMin,uMax,itlim) % note

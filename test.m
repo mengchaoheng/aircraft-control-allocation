@@ -29,29 +29,29 @@ INDX(1:effector)=ones(1,effector);
 
 
 LPmethod=6;% just 2 3 7 ok
-yd=[0;0;0.2]; 
+yd=[0;0;0]; 
 ye=[0;0;0];
 IN_MAT = [B yd ye;uMin' 0 0;uMax' 0 0;INDX  LPmethod 0];
 [u] = LPwrap(IN_MAT);      
 u(INDX>0.5)      
 B(:,INDX>0.5)*u(INDX>0.5)        
 %===================================∑˘÷µ≤‚ ‘==================================================
-N=20;
+N=50;
 x=zeros(effector,(N+1)^2);
 u=zeros(effector,1);
 [X,Y,Z] = sphere(N);
 load('M_des');
-t=0:0.01:100;
-X=0*sin(0.01*pi*t);
-Y=0*cos(0.02*pi*t);
-Z=ones(length(t),1)*1.2;
+% t=0:0.01:100;
+% X=0*sin(0.01*pi*t);
+% Y=0*cos(0.02*pi*t);
+% Z=ones(length(t),1)*1.2;
 x1=zeros(effector,(N+1)^2);
 u1=zeros(effector,1);
 % x2=zeros(effector,(N+1)^2);
 % u2=zeros(effector,1);
 
 for i=1:(N+1)^2%length(M_des(1:1000,1))%%length(X)
-v=1*[X(i);Y(i);Z(i)];% –Èƒ‚÷∏¡ÓM_des(i,:)'%
+v=50*[X(i);Y(i);Z(i)];% –Èƒ‚÷∏¡ÓM_des(i,:)'%
 IN_MAT(1:3,end-1)=v;
 
 %=====================================

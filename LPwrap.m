@@ -124,7 +124,7 @@ emax=ones(k,1)*2e1;
 itlim=50;
 lam=0.1;
 eMax=emax;
-w=0.1*wu;
+w=0.0001*wu;
 switch LPmethod
     case 0
         [u_act, feas, errout,itlim] = DB_LPCA(yd+ye-Bu0,B,wd,up,wu,emax,...
@@ -1598,7 +1598,7 @@ if errout ~=0  % Construct an incorrect solution to accompany error flags
         xout(~e1(1:2*m+1)) = -xout(~e1(1:2*m+1))+h(~e1(1:2*m+1));
     else
 %         [u,~,~] = DPscaled_LPCA(ye,B,uMin,uMax,itlim);
-        [u,~] = SBprio_LPCA(ye,[0;0;0],B,w,up,uMin,uMax,itlim);
+        [u,~] = SBprio_LPCA(ye,[0;0;0],B,w,up,uMin,uMax,50);
         return;
     end
 else  % No Error continue to solve problem

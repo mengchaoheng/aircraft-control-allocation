@@ -15,14 +15,14 @@ load('M_des');  % Pseudo control command for a certain flight,that is come from
 %     M_des(i,:)=CVdt_des(:,:,i)';
 % end
 %-------------------------------------------------------------------------
-aaa=randn(3,100001);
+% aaa=randn(3,100001);
 % copy from INIT_DNI,m
 %-------------------------------------------------------------------------
 %% LOAD TRIM DATA
 % ADMIRE tools used to create linear model trimmed in SSL M=0.3 at 2000 m
 % load('Trim_M0p3ALT2000_LinDATA')
 % ADMIRE tools used to create linear model trimmed in SSL M=0.22 at 20 m
-load('Trim_M0p22ALT20_LinDATA')
+% load('Trim_M0p22ALT20_LinDATA')
 % Clear functions with persistent variables
 
 %% DEFINE CONSTANTS
@@ -47,9 +47,9 @@ CAmethod=6;
 % 3 - Dirction Preserving scaled
 % 4 - Mixed Optimization, single branch
 % 5 - Single Branch==8
-% 6 - priority based on Single Branch
-% 7 - priority based on Direction Preserving
-LPmethod=6;
+% 6 - priority based on Single Branch %超幅值不能回零,解方程有问题。调节w无改善
+% 7 - priority based on Direction Preserving % 首选 
+LPmethod=7;
 
 % Aero Surface Position Limits Function of Mach number
 % This data was taken from the file act_pos_lim.c provided with the ADMIRE
@@ -86,13 +86,13 @@ PD_max = 10; % Roll rate disturbance, rad/s [No data available]
 % disturbance effectors.  Values presented hare are place holder values.
 
 % Effector rate limits
-Urlim=[200*d2r   % R canard, rad/s
-    200*d2r      % L canard, rad/s
-    150*d2r     % RO elevon, rad/s
-    150*d2r     % RI elevon, rad/s
-    150*d2r     % LI elevon, rad/s
-    150*d2r     % LO elevon, rad/s
-    100*d2r     % Rudder, rad/s
+Urlim=[50*d2r   % R canard, rad/s
+    50*d2r      % L canard, rad/s
+    50*d2r     % RO elevon, rad/s
+    50*d2r     % RI elevon, rad/s
+    50*d2r     % LI elevon, rad/s
+    50*d2r     % LO elevon, rad/s
+    50*d2r     % Rudder, rad/s
     10*d2r      % Leading edge flaps, rad/s
     1/dt        % Landing Gear, %/second [no rate limits in Admire]
     100/dt      % Thrust Command, %/second [no rate limits in Admire]
@@ -123,12 +123,12 @@ Urlim=[200*d2r   % R canard, rad/s
 % NOTE: No rate limit data available in Admire simulation for effectors 8
 % through 16, made up place holder values provided here. KAB
 
-UseRL=1; % Position limited commands, UseRL=0, add rate limits UseRL=1
+UseRL=0; % Position limited commands, UseRL=0, add rate limits UseRL=1
 
 
 
 effector=7;
-global NumU Wp
+global NumU Wp 
 NumU=16; % Number of controls
 % Weighted Pseudo Inverse
 W=diag([1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]); %Diagonal weighting matrix
@@ -136,7 +136,7 @@ Wp=W'*W; %Initialize Weight matrix to unity to start
 INDX=zeros(1,NumU);uMin=zeros(NumU,1);uMax=zeros(NumU,1);
 CB=zeros(3,NumU);
 INDX(1:effector)=ones(1,effector);
-
+u0new=zeros(NumU,1);
 % uMin(1:effector)=ones(effector,1)*(-20)*d2r;
 % uMax(1:effector)=ones(effector,1)*20*d2r;
 

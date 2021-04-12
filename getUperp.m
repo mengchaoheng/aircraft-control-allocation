@@ -10,14 +10,14 @@ function [ UK ] = getUperp( IN_MAT )
 % 20160301  KAB Added option to use weighting matrix
 
 % get u_perpendicular, in 7.4.4.1
-global NumU Wp 
+global NumU Wp_aca
 [n1,m1]=size(IN_MAT);
 INDX=IN_MAT(end,:)>0.5;
 Bx=IN_MAT(1:n1-1,INDX);
 [n,m]=size(Bx);
 UK=zeros(NumU,1);
 % If weighting matrix is identity
-if norm(Wp(INDX>0.5,INDX>0.5)-eye(sum(INDX>0.5)))<eps
+if norm(Wp_aca(INDX>0.5,INDX>0.5)-eye(sum(INDX>0.5)))<eps
     % Minimum Norm restoring with equal weighting on effectors, min u'*u
     VV=zeros(n,1);
     VV(n,1)=-2;
@@ -33,9 +33,9 @@ if norm(Wp(INDX>0.5,INDX>0.5)-eye(sum(INDX>0.5)))<eps
         UK(INDX,1)=Kopt*Uperp;
     end
 else
-    % Minimum Norm restoring with weighting matrix, min u'*Wp*u
+%     Minimum Norm restoring with weighting matrix, min u'*Wp_aca*u
     B=Bx(1:n-1,:);
-    Wpp=Wp(INDX>0.5,INDX>0.5);
+    Wpp=Wp_aca(INDX>0.5,INDX>0.5);
     P=Wpp'\B'/(B*(Wpp'\B'));
     N=eye(m,m)-P*B;
     un=-N*Bx(n,:)';

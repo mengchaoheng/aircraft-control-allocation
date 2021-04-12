@@ -7,8 +7,8 @@
 % load('U1');
 % U1(1:3,:)=U1(1:3,:)*0.5;
 % U1(3,:)=U1(3,:)*0.5;
-% load('t1');
-% load('M_des');  % Pseudo control command for a certain flight,that is come from 
+load('t1');
+load('M_des');  % Pseudo control command for a certain flight,that is come from 
 % M_des=zeros(100001,3);
 % for i=1:100001
 %     M_des(i,:)=CVdt_des(:,:,i)';
@@ -25,7 +25,7 @@
 % Clear functions with persistent variables
 
 %% DEFINE CONSTANTS
-dt=0.005; %sim time step, seconds
+dt=0.01; %sim time step, seconds
 d2r=pi/180;
 r2d=180/pi;
 %% CONTROL ALLOCATION
@@ -63,11 +63,11 @@ LPmethod=10;
 
 % Set limits based on trim condition Mach number
 % Lower limits
-% u_min=(-20)*pi/180;
-u_min=umin(1);
+u_min=(-20)*pi/180;
+
 % Upper limits
-% u_max=20*pi/180;
-u_max=umax(1);
+u_max=20*pi/180;
+
 % Other Effector Position Limits
 LG_min = 0; % Landing gear, 0 = Gear Up
 LG_max = 1; % Landing gear, 1 = Gear Down
@@ -137,33 +137,27 @@ UseRL=0; % Position limited commands, UseRL=0, add rate limits UseRL=1
 % CB=CCV*Bbare;
 
 effector=4;
-global NumU  Wp_aca
+global NumU Wp 
 NumU=16; % Number of controls
 % Weighted Pseudo Inverse
-W_aca=diag([1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]); %Diagonal weighting matrix
-Wp_aca=W_aca'*W_aca; %Initialize Weight matrix to unity to start
+W=diag([1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]); %Diagonal weighting matrix
+Wp=W'*W; %Initialize Weight matrix to unity to start
 INDX=zeros(1,NumU);uMin=zeros(NumU,1);uMax=zeros(NumU,1);
 CB=zeros(3,NumU);
 INDX(1:effector)=ones(1,effector);
 u0new=zeros(NumU,1);
-
-uMin(1:effector)=umin;
-uMax(1:effector)=umax;
-
-% uMin(1:effector)=ones(effector,1)*(-20)*d2r;
-% uMax(1:effector)=ones(effector,1)*20*d2r;
+uMin(1:effector)=ones(effector,1)*(-20)*d2r;
+uMax(1:effector)=ones(effector,1)*20*d2r;
 
 % uMax(1:effector)=ones(effector,1)*30*d2r;
 % uMax(effector+1:end)=[30*d2r;LG_max; TSS_max; DTY_max; DTZ_max; UD_max; VD_max; WD_max; PD_max];
 % uMin(1:effector)=ones(effector,1)*(-30)*d2r;
 % uMin(effector+1:end)=[-10*d2r;LG_min; TSS_min; DTY_min; DTZ_min; UD_min; VD_min; WD_min; PD_min];
 
-global B
-CB(1:3,1:effector)=B;
 
-% CB(1:3,1:effector)=[-0.5     0       0.5     0;
-%                      0      -0.5     0       0.5;
-%                      0.25    0.25    0.25    0.25];
+CB(1:3,1:effector)=[-0.5     0       0.5     0;
+                     0      -0.5     0       0.5;
+                     0.25    0.25    0.25    0.25];
 % CB(:,1:effector) =[0.7073   -0.7073   -3.4956   -3.0013    3.0013    3.4956    2.1103;
 %     1.1204    1.1204   -0.7919   -1.2614   -1.2614   -0.7919    0.0035;
 %    -0.3309    0.3309   -0.1507   -0.3088    0.3088    0.1507   -1.2680];

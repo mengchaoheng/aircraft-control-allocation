@@ -5,7 +5,7 @@
 % this is the init file
 clear all;
 %-------------------------------------------------------------------------
-load('U1');
+% load('U1');
 % U1(1:3,:)=U1(1:3,:)*0.5;
 % U1(3,:)=U1(3,:)*0.5;
 load('t1');
@@ -43,13 +43,17 @@ CAmethod=6;
 % when CAmethod is 6
 % 0 - Dual Branch both 1-norm
 % 1 - Dual Branch, 1-norm and inf-norm
-% 2 - Direction Preserving==9
-% 3 - Dirction Preserving scaled
+% 2 - Direction Preserving==9   %无re时全局可回零，逐帧不可回零，恢复模块不但可以回零还可以使曲线圆滑
+% 3 - Dirction Preserving scaled %全局局部不需要re均可回零，曲线比2光滑但re模块更佳
 % 4 - Mixed Optimization, single branch
-% 5 - Single Branch==8
-% 6 - priority based on Single Branch %超幅值不能回零,解方程有问题。调节w无改善
-% 7 - priority based on Direction Preserving % 首选 
-LPmethod=7;
+% 5 - Single Branch==8  %无re时全局可回零，逐帧不可回零，恢复模块不但可以回零还可以使曲线圆滑
+% 6 - priority based on Single Branch %超幅值不能回零,解方程有问题。调节w无改善，5同。%次选
+% 7 - priority based on Direction Preserving % 首选 次选
+% 8 
+% 9 
+% 10 - priority based onDirction Preserving scaled % 首选 
+% 问题，无法分解deta_m，因此优先级无法逐帧运行，因此选不考虑速度约束，恢复模块做更优解。因此5、7、10均可
+LPmethod=10;
 
 % Aero Surface Position Limits Function of Mach number
 % This data was taken from the file act_pos_lim.c provided with the ADMIRE
@@ -86,14 +90,14 @@ PD_max = 10; % Roll rate disturbance, rad/s [No data available]
 % disturbance effectors.  Values presented hare are place holder values.
 
 % Effector rate limits
-Urlim=[50*d2r   % R canard, rad/s
-    50*d2r      % L canard, rad/s
-    50*d2r     % RO elevon, rad/s
-    50*d2r     % RI elevon, rad/s
-    50*d2r     % LI elevon, rad/s
-    50*d2r     % LO elevon, rad/s
-    50*d2r     % Rudder, rad/s
-    10*d2r      % Leading edge flaps, rad/s
+Urlim=[250*d2r   % R canard, rad/s
+    250*d2r      % L canard, rad/s
+    250*d2r     % RO elevon, rad/s
+    250*d2r     % RI elevon, rad/s
+    250*d2r     % LI elevon, rad/s
+    250*d2r     % LO elevon, rad/s
+    250*d2r     % Rudder, rad/s
+    210*d2r      % Leading edge flaps, rad/s
     1/dt        % Landing Gear, %/second [no rate limits in Admire]
     100/dt      % Thrust Command, %/second [no rate limits in Admire]
     1           % Yaw Thrust Vectoring, rad/s [no rate limits in Admire]
@@ -125,9 +129,15 @@ Urlim=[50*d2r   % R canard, rad/s
 
 UseRL=0; % Position limited commands, UseRL=0, add rate limits UseRL=1
 
+% % For Linear DI
+% % Define C matrix to select control variables
+% % Pb, Qb, Rb
+% CCV=[0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1];
+% CCV=[CCV zeros(3,22)];
+% % CB only has control variables (3xm)
+% CB=CCV*Bbare;
 
-
-effector=7;
+effector=4;
 global NumU Wp 
 NumU=16; % Number of controls
 % Weighted Pseudo Inverse
@@ -137,32 +147,22 @@ INDX=zeros(1,NumU);uMin=zeros(NumU,1);uMax=zeros(NumU,1);
 CB=zeros(3,NumU);
 INDX(1:effector)=ones(1,effector);
 u0new=zeros(NumU,1);
-% uMin(1:effector)=ones(effector,1)*(-20)*d2r;
-% uMax(1:effector)=ones(effector,1)*20*d2r;
+uMin(1:effector)=ones(effector,1)*(-20)*d2r;
+uMax(1:effector)=ones(effector,1)*20*d2r;
 
-uMax(1:effector)=ones(effector,1)*30*d2r;
-uMax(effector+1:end)=[30*d2r;LG_max; TSS_max; DTY_max; DTZ_max; UD_max; VD_max; WD_max; PD_max];
-uMin(1:effector)=ones(effector,1)*(-30)*d2r;
-uMin(effector+1:end)=[-10*d2r;LG_min; TSS_min; DTY_min; DTZ_min; UD_min; VD_min; WD_min; PD_min];
+% uMax(1:effector)=ones(effector,1)*30*d2r;
+% uMax(effector+1:end)=[30*d2r;LG_max; TSS_max; DTY_max; DTZ_max; UD_max; VD_max; WD_max; PD_max];
+% uMin(1:effector)=ones(effector,1)*(-30)*d2r;
+% uMin(effector+1:end)=[-10*d2r;LG_min; TSS_min; DTY_min; DTZ_min; UD_min; VD_min; WD_min; PD_min];
 
 
+CB(1:3,1:effector)=[-0.5     0       0.5     0;
+                     0      -0.5     0       0.5;
+                     0.25    0.25    0.25    0.25];
+% CB(:,1:effector) =[0.7073   -0.7073   -3.4956   -3.0013    3.0013    3.4956    2.1103;
+%     1.1204    1.1204   -0.7919   -1.2614   -1.2614   -0.7919    0.0035;
+%    -0.3309    0.3309   -0.1507   -0.3088    0.3088    0.1507   -1.2680];
 
-% [-0.5   0       0.5   0;
-%     0  -0.5    0       0.5;
-%     0.25   0.25   0.25   0.25];
-% CB(1:3,1:effector)=[-0.50004   0       0.5001   0;
-%     0  -0.5005    0       0.50003;
-%     0.25005   0.2502   0.251   0.2503];
-CB(:,1:effector) =[0.7073   -0.7073   -3.4956   -3.0013    3.0013    3.4956    2.1103;
-    1.1204    1.1204   -0.7919   -1.2614   -1.2614   -0.7919    0.0035;
-   -0.3309    0.3309   -0.1507   -0.3088    0.3088    0.1507   -1.2680];
-% % For Linear DI
-% % Define C matrix to select control variables
-% % Pb, Qb, Rb
-% CCV=[0 0 0 1 0 0;0 0 0 0 1 0;0 0 0 0 0 1];
-% CCV=[CCV zeros(3,22)];
-% % CB only has control variables (3xm)
-% CB=CCV*Bbare;
 
 
 % % Use only first 7 (aerodynamic) controls

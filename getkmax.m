@@ -13,9 +13,9 @@ function [ K ] = getkmax( IN_MAT )
 % LimitScale, get K_max, in 7.4.4.1
 
 INDX=IN_MAT(3,:)>0.5;
-u_kopt=IN_MAT(4,INDX)
-MaxValues=IN_MAT(1,INDX)
-MinValues=IN_MAT(2,INDX)
+u_kopt=IN_MAT(4,INDX);
+MaxValues=IN_MAT(1,INDX);
+MinValues=IN_MAT(2,INDX);
 % if any(abs(MaxValues)<eps) || any(abs(MinValues)<eps)
 %     K=0;
 %     return;
@@ -28,8 +28,8 @@ if any(MinValues>0)
     MinValues(MinValues>0)=-eps;
 end
 % u_abs=abs(u_kopt);
-u_abs=[u_kopt(u_kopt>0) -u_kopt(u_kopt<0)]
-Max=[MaxValues(u_kopt>0) -MinValues(u_kopt<0)]
+u_abs=[u_kopt(u_kopt>0) -u_kopt(u_kopt<0)];
+Max=[MaxValues(u_kopt>0) -MinValues(u_kopt<0)];
 
 
 K_temp=Max(u_abs>eps)./u_abs(u_abs>eps);

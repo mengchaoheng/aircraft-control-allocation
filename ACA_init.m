@@ -25,7 +25,7 @@
 % Clear functions with persistent variables
 
 %% DEFINE CONSTANTS
-dt=0.005; %sim time step, seconds
+dt=0.01; %sim time step, seconds
 d2r=pi/180;
 r2d=180/pi;
 %% CONTROL ALLOCATION

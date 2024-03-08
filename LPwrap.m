@@ -895,8 +895,8 @@ function [u,itlim,errout,rho] = DPscaled_LPCA(yd,B,uMin,uMax,itlim)
 %
 %  For yd outside the AMS, the solution returned is that the
 %  maximum in the direction of yd
-%    B*u= lamda*yd
-%    max lamda s.t. uMin <= u <= uMax
+%      max lamda
+%     s.t. B*u= lamda*yd  uMin <= u <= uMax  0<= lambda but not <=1   so is different from DP_LPCA
 %
 %  Reducing the degrees of freedom elminates the problems of redundant
 %  solutions for attainable objectives. If the desired objective is on the

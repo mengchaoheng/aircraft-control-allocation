@@ -24,7 +24,7 @@ Aircraft Control Allocation addresses the problem of allocating redundant flight
 the detail of the usage of the simulation can be find on `SimulationQuickStartGuide.pdf`, and appendix B of this book git some review too.
 
 ## Use as lib
-For test LP control allocation method, run `test_LPwrap`, other test file can use like this.
+For test LP control allocation method, run `test_ACA.m`, other test file can use like this.
 
 ## Note 
 For aircraft simulation, the reader maybe need to learn about the ADMIRE, but for study control allocation method, just use the algorithm Implements files `xx_wrap` as function, then create and run `test_xx` is enough.

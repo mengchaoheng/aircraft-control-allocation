@@ -88,9 +88,9 @@ up=zeros(m_act,1);
 wu=ones(m_act,1);
 emax=ones(k,1)*2e1;
 itlim=5e2;
-lam=1;
+lam=0.01;
 eMax=emax;
-w=wu;
+w=0.01*wu;
 
 switch LPmethod
     case 0
@@ -307,7 +307,7 @@ x0 = [ max(eyd,zeros(n,1));max(-eyd,zeros(n,1));zeros(m,1)];
 %
 indn = 1:n;
 numzer = length(find(eyd==0));
-inBi = [indn(eyd>0) n+indn(eyd<0) (2*n):( (2*n)-1+numzer )];
+inBi = [indn(eyd>0) n+indn(eyd<0) (2*n)+(1:numzer)];
 
 e = true(2*n+m,1);
 
@@ -1087,7 +1087,7 @@ x0 = [ max(eyp,zeros(n,1));max(-eyp,zeros(n,1));zeros(2*m,1)];
 %
 indn = 1:n;
 numzer = length(find(eyp==0));
-inBi = [indn(eyp>0) n+indn(eyp<0) (2*n):( (2*n)-1+numzer )];
+inBi = [indn(eyp>0) n+indn(eyp<0) (2*n)+(1:numzer)];
 e = true(2*(n+m),1);
 
 %Solve using Bounded Revised Simplex

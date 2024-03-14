@@ -798,9 +798,9 @@ end
 
 if errout ~=0  % Construct an incorrect solution to accompany error flags
     xout = zeros(m+1,1);
-    indv = indB1<=(m+1);
+    indv = inB1<=(m+1);
     xout(inB1(indv)) = y1(indv);
-    xout(~e1(1:m+1)) = -xout(~e(1:m+1))+h(~e1(1:m+1));
+    xout(~e1(1:m+1)) = -xout(~e1(1:m+1))+h(~e1(1:m+1));
     
 else  % No Error continue to solve problem
     

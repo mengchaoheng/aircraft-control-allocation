@@ -949,7 +949,7 @@ end
 if errout ~=0  % Construct an incorrect solution to accompany error flags
     xout = zeros(m,1);
     xout(inB1(1:m)) = y1(1:m);
-    xout(~e1(1:m)) = -xout(~e(1:m))+h(~e1(1:m));
+    xout(~e1(1:m)) = -xout(~e1(1:m))+h(~e1(1:m));
     
 else  % No Error continue to solve problem
     

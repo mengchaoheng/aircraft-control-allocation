@@ -23,8 +23,20 @@ Aircraft Control Allocation addresses the problem of allocating redundant flight
 ## USING THE LINEAR SIMULATION
 the detail of the usage of the simulation can be find on `SimulationQuickStartGuide.pdf`, and appendix B of this book git some review too.
 
-## Use as lib
-For test LP control allocation method, run `test_ACA.m`, other test file can use like this.
+## Test report
+For test control allocation method of the book, run `test_ACA.m`, other test file can use like this.
+
+* LPwrap
+    1. Testing using hover flight data:
+        - Effectors jitter appears when LPmethod=0, 1. 
+        - Effectors saturation when LPmethod=2
+    2. Tests in any unit direction：
+        - All tests passed but have warning when LPmethod=0, 1, 4.
+* CGIwrap:
+    - All tests passed
+
+* DAwrap:
+    - All tests passed
 
 ## Note 
 For aircraft simulation, the reader maybe need to learn about the ADMIRE, but for study control allocation method, just use the algorithm Implements files `xx_wrap` as function, then create and run `test_xx` is enough.

@@ -91,7 +91,7 @@ itlim=5e2;
 lam=0.01;
 eMax=emax;
 w=0.01*wu;
-upper_lam=1;% or large number that < Inf
+upper_lam=1e4;% upper_lam>=1, set large number that < Inf will be cool
 switch LPmethod
     case 0
         [u_act, feas, errout,itlim] = DB_LPCA(yd,B,wd,up,wu,emax,...
@@ -805,7 +805,7 @@ if errout ~=0  % Construct an incorrect solution to accompany error flags
     
 else  % No Error continue to solve problem
     
-    
+    % or set inB1=[1 2 3] by observe
     %Solve using initial problem from above
     [y2, inB2, e2,itlim,errsimp] = simplxuprevsol(A ,c',b,inB1,h,e1(1:m+1),n,m+1,itlim);
     

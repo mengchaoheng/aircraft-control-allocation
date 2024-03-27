@@ -772,6 +772,7 @@ h = [uMax-uMin; upper_lam];
 
 
 %To find Feasible solution construct problem with appended slack variables
+% A.6.4 Initialization of the Simplex Algorithm of <Aircraft control allocation>
 sb = 2*(b > 0)-1;
 Ai = [A diag(sb)];   
 ci = [zeros(m+1,1);ones(n,1)];
@@ -1298,7 +1299,7 @@ function [y0, inB, e,itlim,errout] = simplxuprevsol(A,ct,b,inB,h,e,varargin)
 %          inB [m]   = Vector of indices of unknowns in the initial basic set
 %          inD [n-m] = Vector of indices of unknowns not in the initial basic set
 %          h[n,1]    = Upper Bound for unknowns
-%          e[n,1]    = Sign for unknown variables (+ lower bound, - upper bound)
+%          e[n,1]    = Sign for unknown variables (1 lower bound, - 0 upper bound)
 %  Optional inputs:
 %          m,n       = number of constraints, unknowns (Opposite standard
 %                      CA convention

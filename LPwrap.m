@@ -1306,7 +1306,7 @@ function [y0, inB, e,itlim,errout] = simplxuprevsol(A,ct,b,inB,h,e,varargin)
 %          itlim     = Upper bound on the allowed iterations\
 %
 % Outputs:
-%         yout[n,1]  = Optimal output variable
+%         yout[m,1]  = Optimal output variable
 %         inBout     = indices of Basic vectors in output
 %         eout       = sign associate with output unknowns
 %         itout      = number of iterations remaining out of itlim

@@ -106,4 +106,6 @@ index a7d0281..1c223f0 100644
 3. Use upper_lam for DP_LPCA of LPwrap to prevent control surfaces from approaching position limits.
 ## Note 
 For aircraft simulation, the reader maybe need to learn about the ADMIRE, but for study control allocation method, just use the algorithm Implements files `xx_wrap` as function, then create and run `test_xx` is enough.
+
+4. update `yout[n,1]  = Optimal output variable` to `yout[m,1]  = Optimal output variable`
  

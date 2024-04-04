@@ -953,7 +953,7 @@ end
 
 if errout ~=0  % Construct an incorrect solution to accompany error flags
     xout = zeros(m,1);
-    xout(inB1(1:m)) = y1(1:m);
+    xout(inB1(1:n-1)) = y1(1:n-1); % maybe want to calc xout(inB1) = y1 ? but we can sure that xout(inB1(1:n)) = y1(1:n); is error, since out of the size.
     xout(~e1(1:m)) = -xout(~e1(1:m))+h(~e1(1:m));
     
 else  % No Error continue to solve problem

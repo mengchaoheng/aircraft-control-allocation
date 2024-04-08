@@ -1,4 +1,4 @@
-function [u] = LPwrap(IN_MAT)
+function [u] = LPwrap(IN_MAT,v,NumU)
 % Make single input, single output version of Linear Programming for use in
 % Simulink via the MATLAB Fcn block
 % IN_MAT = [B     d
@@ -9,8 +9,8 @@ function [u] = LPwrap(IN_MAT)
 % 20140905  Created version to use Roger Beck's DB_LPCA program
 % 20151206  Updated with Roger Beck's latest version of code and added 
 %           LPmethod to select the various Linear Programming algorithms 
-
-global NumU
+% 20240408  for running on parpool, add the other input v instead of v=IN_MAT(1:k,end)
+% global NumU
 % Get sizes
 [k2,m1]=size(IN_MAT);
 k=k2-3;
@@ -22,7 +22,7 @@ if k<1 || m<1 || norm(IN_MAT)<1e-16
 end
 % Partition input matrix into component matrices
 B=IN_MAT(1:k,1:m);
-v=IN_MAT(1:k,end);
+% v=IN_MAT(1:k,end);
 umin=IN_MAT(k+1,1:m)';
 umax=IN_MAT(k+2,1:m)';
 LPmethod=IN_MAT(end,end);
@@ -91,7 +91,8 @@ itlim=5e2;
 lam=0.01;
 eMax=emax;
 w=0.01*wu;
-upper_lam=1e4;% upper_lam>=1, set large number that < Inf will be cool
+% upper_lam  gives a saturated result for the attainable moment. 
+upper_lam=1/eps;% upper_lam>=1, set large number that < Inf will be cool
 switch LPmethod
     case 0
         [u_act, feas, errout,itlim] = DB_LPCA(yd,B,wd,up,wu,emax,...
@@ -1336,7 +1337,7 @@ switch  length(varargin)
  end    	
     	
 %Tolerance for unknown == 0
-tol = 1e-10;
+tol = eps;
 
 %Index list for non-basic variables
 nind = 1:(n-m);

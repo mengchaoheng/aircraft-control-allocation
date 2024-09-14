@@ -1,4 +1,4 @@
-function [u] = LPwrap(IN_MAT,v,NumU)
+function [u] = LPwrap(IN_MAT)
 % Make single input, single output version of Linear Programming for use in
 % Simulink via the MATLAB Fcn block
 % IN_MAT = [B     d
@@ -10,7 +10,7 @@ function [u] = LPwrap(IN_MAT,v,NumU)
 % 20151206  Updated with Roger Beck's latest version of code and added 
 %           LPmethod to select the various Linear Programming algorithms 
 % 20240408  for running on parpool, add the other input v instead of v=IN_MAT(1:k,end)
-% global NumU
+global NumU
 % Get sizes
 [k2,m1]=size(IN_MAT);
 k=k2-3;
@@ -22,7 +22,7 @@ if k<1 || m<1 || norm(IN_MAT)<1e-16
 end
 % Partition input matrix into component matrices
 B=IN_MAT(1:k,1:m);
-% v=IN_MAT(1:k,end);
+v=IN_MAT(1:k,end);
 umin=IN_MAT(k+1,1:m)';
 umax=IN_MAT(k+2,1:m)';
 LPmethod=IN_MAT(end,end);

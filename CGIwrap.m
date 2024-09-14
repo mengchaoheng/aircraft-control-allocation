@@ -1,4 +1,4 @@
-function [u] = CGIwrap(IN_MAT,v,NumU)
+function [u] = CGIwrap(IN_MAT)
 % Make single input, single output version of Cascading Generalized Inverse
 % control allocation for use in Simulink via the MATLAB Fcn block
 % IN_MAT = [B     d
@@ -8,7 +8,7 @@ function [u] = CGIwrap(IN_MAT,v,NumU)
 % 20140524  KAB Modified to include INDX, which is used to specify active
 %               effectors
 % 20160316  KAB Modified to simplify implementation
-% global NumU
+global NumU
 % Get sizes
 [k2,m1]=size(IN_MAT);
 k=k2-3;
@@ -20,7 +20,7 @@ if k<1 || m<1 || norm(IN_MAT)<1e-16
 end
 % Partition input matrix into component matrices
 B=IN_MAT(1:k,1:m);
-% v=IN_MAT(1:k,end);
+v=IN_MAT(1:k,end);
 umin=IN_MAT(k+1,1:m)';
 umax=IN_MAT(k+2,1:m)';
 INDX=IN_MAT(k+3,1:m)';

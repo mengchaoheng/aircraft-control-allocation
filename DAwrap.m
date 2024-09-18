@@ -35,8 +35,9 @@ umax_act=umax(INDX>0.5);
 [u_act,a] = da_attain(B_act,v,umin_act,umax_act);
 
 u=zeros(NumU,1);
-u(INDX>0.5,1)=u_act;
-
+if(~isempty(u_act))
+    u(INDX>0.5,1)=u_act;
+end
 end
 
 %KAB mod of files from MC Cotting

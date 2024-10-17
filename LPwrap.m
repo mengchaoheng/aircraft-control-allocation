@@ -9,7 +9,6 @@ function [u] = LPwrap(IN_MAT)
 % 20140905  Created version to use Roger Beck's DB_LPCA program
 % 20151206  Updated with Roger Beck's latest version of code and added 
 %           LPmethod to select the various Linear Programming algorithms 
-% 20240408  for running on parpool, add the other input v instead of v=IN_MAT(1:k,end)
 global NumU
 % Get sizes
 [k2,m1]=size(IN_MAT);

@@ -91,8 +91,8 @@ itlim=5e2;
 lam=0.01;
 eMax=emax;
 w=0.01*wu;
-% upper_lam  gives a saturated result for the attainable moment. 
-upper_lam=1/eps;% upper_lam>=1, set large number that < Inf will be cool
+% upper_lam  gives a saturated result for the attainable moment. 2024-10-17 new view: restoring
+upper_lam=1;%1/eps;% upper_lam>=1, set large number that < Inf will be cool
 switch LPmethod
     case 0
         [u_act, feas, errout,itlim] = DB_LPCA(yd,B,wd,up,wu,emax,...

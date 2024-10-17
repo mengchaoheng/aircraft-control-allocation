@@ -91,8 +91,6 @@ itlim=5e2;
 lam=0.01;
 eMax=emax;
 w=0.01*wu;
-% upper_lam  gives a saturated result for the attainable moment. 2024-10-17 new view: restoring
-upper_lam=1;%1/eps;% upper_lam>=1, set large number that < Inf will be cool
 switch LPmethod
     case 0
         [u_act, feas, errout,itlim] = DB_LPCA(yd,B,wd,up,wu,emax,...
@@ -107,7 +105,7 @@ switch LPmethod
         %      Objective Error Minimization (1-norm)
         %      Control Error Minimization (inf-norm)
     case 2
-        [u_act, errout] = DP_LPCA(yd,B,uMin,uMax,itlim,upper_lam);
+        [u_act, errout] = DP_LPCA(yd,B,uMin,uMax,itlim);
         % Direction Preserving Control Allocation Linear Program    
     case 3
         [u_act,itlim,errout] = DPscaled_LPCA(yd,B,uMin,uMax,itlim);
@@ -689,7 +687,7 @@ end %DBinfcaLP1s_sol
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [u, errout] = DP_LPCA(yd,B,uMin,uMax,itlim,upper_lam);
+function [u, errout] = DP_LPCA(yd,B,uMin,uMax,itlim);
 % Direction Preserving Control Allocation Linear Program
 %
 % function [u, errout] = DP_LPCA(yd,B,uMin,uMax,itlim);
@@ -768,7 +766,7 @@ end;
 A = [B -yd];
 b = -B*uMin;
 c = [zeros(m,1);-1];
-h = [uMax-uMin; upper_lam];
+h = [uMax-uMin; 1];
 
 
 
@@ -832,9 +830,6 @@ end
 
 %Transform back to control variables
 u = xout(1:m)+uMin;
-if(xout(m+1)>1) %Use upper_lam to prevent control surfaces from approaching position limits
-    u =u /xout(m+1);
-end
 return;
 end
 

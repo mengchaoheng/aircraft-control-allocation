@@ -42,6 +42,8 @@ we Use the moments in all directions on the unit sphere as output and test the o
 * DAwrap:
     - All tests passed
 ## Change log
+
+By comparing master with fd4b5.
 1. add readme.md
 2. fix bug of `LPwrap.m`,  the diff is:
 ```sh
@@ -103,8 +105,11 @@ index a7d0281..1c223f0 100644
 
 ``` 
 
+3. update `yout[n,1]  = Optimal output variable` to `yout[m,1]  = Optimal output variable`
+
+4. add LPwrap_par.m for  add parallel computing support.
 ## Note 
 For aircraft simulation, the reader maybe need to learn about the ADMIRE, but for study control allocation method, just use the algorithm Implements files `xx_wrap` as function, then create and run `test_xx` is enough.
 
-4. update `yout[n,1]  = Optimal output variable` to `yout[m,1]  = Optimal output variable`
+
  

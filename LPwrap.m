@@ -816,7 +816,15 @@ else  % No Error continue to solve problem
     xout = zeros(m+1,1);
     xout(inB2) = y2;
     xout(~e2) = -xout(~e2)+h(~e2);
-    
+    % test for A_F*x_F + A_N*x_N = b
+    inD2 = setdiff(1:m+1, inB2);
+    test=inv(A(:,inB2))*(b-A(:,inD2)*xout(inD2))-xout(inB2);
+    if(norm(test)> 10*eps)
+        disp('> 0');
+    else
+        % size(inB2)
+        % disp('< 0');
+    end
     if itlim<=0
         errout = 3;
         disp('Too Many Iterations Finding Final Solution');

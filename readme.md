@@ -1,5 +1,5 @@
 # Simulation Files Of Aircraft Control Allocation
-the book "Aircraft Control Allocation" by Wayne Durham, Kenneth A. Bordignon and Roger Beck, which provide this files on [the companion site ](https://www.wiley.com//legacy/wileychi/durham2/). this repos. use this files to developed some new method about control allocation. The master branch of this repos. is default files in the simulation.
+The book "Aircraft Control Allocation" by Wayne Durham, Kenneth A. Bordignon and Roger Beck provides these files on the [the companion site ](https://www.wiley.com//legacy/wileychi/durham2/). This repository uses these files to develop some new methods about control allocation. The master branch of this repository contains the default files for the simulation.
 
 
 
